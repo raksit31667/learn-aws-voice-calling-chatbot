@@ -51,7 +51,11 @@ For each user response, switch or repeat step 3-5.
 
 ### Provision Lex with Terraform
 
-TBD
+The Terraform scripts used for provisioning Amazon Lex bot and intents are included in this
+repository. Use
+[aws_lex_bot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lex_bot)
+and [aws_lex_intent](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lex_intent)
+as references.
 
 ### Lex configuration
 
