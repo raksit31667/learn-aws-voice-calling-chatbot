@@ -1,0 +1,630 @@
+{
+  "modules": [
+    {
+      "id": "enable-logging-uuid",
+      "type": "SetLoggingBehavior",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "set-voice-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "LoggingBehavior",
+          "value": "Enable"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 157,
+          "y": 197
+        }
+      }
+    },
+    {
+      "id": "disable-call-recording-uuid",
+      "type": "SetRecordingBehavior",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "enable-logging-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "RecordingBehaviorOption",
+          "value": "Disable"
+        },
+        {
+          "name": "RecordingParticipantOption",
+          "value": "Both"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 154,
+          "y": 17
+        }
+      }
+    },
+    {
+      "id": "set-voice-uuid",
+      "type": "SetVoice",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "wait-for-customer-answer-phone-call-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "GlobalVoice",
+          "value": "Kimberly"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 159,
+          "y": 374
+        },
+        "overrideConsoleVoice": false,
+        "defaultVoice": "Conversational"
+      }
+    },
+    {
+      "id": "check-lambda-status-code-uuid",
+      "type": "CheckAttribute",
+      "branches": [
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "500",
+          "transition": "chatbot-error-response-uuid"
+        },
+        {
+          "condition": "NoMatch",
+          "transition": "check-customer-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Attribute",
+          "value": "statusCode"
+        },
+        {
+          "name": "Namespace",
+          "value": "External"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 1675,
+          "y": 17
+        },
+        "conditionMetadata": [
+          {
+            "id": "internal-error-equals-uuid",
+            "operator": {
+              "name": "Starts With",
+              "value": "Starts With",
+              "shortDisplay": "starts with"
+            },
+            "value": "5"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wait-for-customer-answer-phone-call-uuid",
+      "type": "GetUserInput",
+      "branches": [
+        {
+          "condition": "Timeout",
+          "transition": "chatbot-greetings-response-uuid"
+        },
+        {
+          "condition": "NoMatch",
+          "transition": "chatbot-greetings-response-uuid"
+        },
+        {
+          "condition": "Error",
+          "transition": "chatbot-greetings-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "text"
+        },
+        {
+          "name": "Timeout",
+          "value": "5"
+        },
+        {
+          "name": "MaxDigits",
+          "value": "1"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 301,
+          "y": 569
+        },
+        "conditionMetadata": [],
+        "useDynamic": false
+      },
+      "target": "Digits"
+    },
+    {
+      "id": "chatbot-disconnect-uuid",
+      "type": "Disconnect",
+      "branches": [],
+      "parameters": [],
+      "metadata": {
+        "position": {
+          "x": 2244,
+          "y": 591
+        }
+      }
+    },
+    {
+      "id": "chatbot-decline-response-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-goodbye-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "Offer is successfully declineed",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "text"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 2239,
+          "y": 168
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "chatbot-goodbye-response-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-disconnect-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "Have a good day",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "text"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 2240,
+          "y": 366
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "check-customer-response-uuid",
+      "type": "CheckAttribute",
+      "branches": [
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "accept",
+          "transition": "chatbot-accept-response-uuid"
+        },
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "decline",
+          "transition": "chatbot-decline-response-uuid"
+        },
+        {
+          "condition": "NoMatch",
+          "transition": "chatbot-goodbye-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Attribute",
+          "value": "offerStatus"
+        },
+        {
+          "name": "Namespace",
+          "value": "User Defined"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 1919,
+          "y": 18
+        },
+        "conditionMetadata": [
+          {
+            "id": "accept-equals-uuid",
+            "operator": {
+              "name": "Equals",
+              "value": "Equals",
+              "shortDisplay": "="
+            },
+            "value": "accept"
+          },
+          {
+            "id": "decline-equals-uuid",
+            "operator": {
+              "name": "Equals",
+              "value": "Equals",
+              "shortDisplay": "="
+            },
+            "value": "decline"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chatbot-accept-response-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-goodbye-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "<speak>\nYou have accepted the offer. The offer details are: location \n<prosody rate=\"slow\">\n<say-as interpret-as=\"spell-out\">$.Attributes.eventLocationStreetNumber</say-as>\n$.Attributes.eventLocationStreetName , $.Attributes.eventLocationSuburb , $.Attributes.eventLocationState, \n<say-as interpret-as=\"spell-out\">$.Attributes.eventLocationPostCode</say-as>\n<s>license plate number {{licensePlate}}</s>\n<s>colour {{colour}}</s>\n<s>vehicle model {{vehicleModel}}</s>\n</prosody>\n</speak>",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "ssml"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 2238,
+          "y": 20
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "chatbot-greetings-response-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-offers-customer-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "Hello $.Attributes.CustomerName",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "text"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 413,
+          "y": 28
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "repeat-operation-uuid",
+      "type": "Loop",
+      "branches": [
+        {
+          "condition": "Looping",
+          "transition": "chatbot-ask-customer-uuid"
+        },
+        {
+          "condition": "Complete",
+          "transition": "chatbot-error-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "LoopCount",
+          "value": "1"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 855,
+          "y": 470
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "chatbot-offers-customer-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-ask-customer-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "<speak>\nThe free COVID-19 vaccine has been delivered to you at\n<prosody rate=\"slow\">\n<say-as interpret-as=\"spell-out\">$.Attributes.streetNumber</say-as>\n$.Attributes.streetName , $.Attributes.city , $.Attributes.state, \n<say-as interpret-as=\"spell-out\">$.Attributes.postalCode</say-as>\n</prosody>\n</speak>",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "ssml"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 647,
+          "y": 30
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "collect-lambda-outputs-uuid",
+      "type": "SetAttributes",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "check-lambda-status-code-uuid"
+        },
+        {
+          "condition": "Error",
+          "transition": "chatbot-error-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Attribute",
+          "value": "offerId",
+          "key": "offerId",
+          "namespace": "User Defined"
+        },
+        {
+          "name": "Attribute",
+          "value": "Lex.IntentName",
+          "key": "offerStatus",
+          "namespace": "System"
+        },
+        {
+          "name": "Attribute",
+          "value": "statusCode",
+          "key": "statusCode",
+          "namespace": "External"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 1428,
+          "y": 19
+        }
+      }
+    },
+    {
+      "id": "chatbot-error-response-uuid",
+      "type": "PlayPrompt",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "chatbot-disconnect-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "There has been an unexpected error and your command could not be processed successfully. Please try again in the mobile app. Sorry for the inconvenience and have a good day.",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "text"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 1204,
+          "y": 458
+        },
+        "useDynamic": false
+      }
+    },
+    {
+      "id": "chatbot-ask-customer-uuid",
+      "type": "GetUserInput",
+      "branches": [
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "accept",
+          "transition": "invoke-lambda-function-uuid"
+        },
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "decline",
+          "transition": "invoke-lambda-function-uuid"
+        },
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "repeatOfferDetails",
+          "transition": "chatbot-offers-customer-uuid"
+        },
+        {
+          "condition": "Evaluate",
+          "conditionType": "Equals",
+          "conditionValue": "repeatOptions",
+          "transition": "repeat-operation-uuid"
+        },
+        {
+          "condition": "NoMatch",
+          "transition": "chatbot-error-response-uuid"
+        },
+        {
+          "condition": "Error",
+          "transition": "chatbot-error-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "<speak>\nYou can say the following: <break time=\"1s\"/>\nAccept <break time=\"1.5s\"/>\nDecline <break time=\"1.5s\"/>\nRepeat offer detail,<break time=\"1.5s\"/>\nRepeat options\n</speak>",
+          "namespace": null
+        },
+        {
+          "name": "TextToSpeechType",
+          "value": "ssml"
+        },
+        {
+          "name": "BotName",
+          "value": "FreeCovidVaccineBot"
+        },
+        {
+          "name": "BotAlias",
+          "value": "$LATEST"
+        },
+        {
+          "name": "BotRegion",
+          "value": "ap-southeast-1"
+        },
+        {
+          "name": "Parameter",
+          "key": "x-amz-lex:barge-in-enabled:*:*",
+          "value": "true",
+          "namespace": null
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 912,
+          "y": 14
+        },
+        "conditionMetadata": [
+          {
+            "id": "accept-option-uuid",
+            "value": "accept"
+          },
+          {
+            "id": "decline-option-uuid",
+            "value": "decline"
+          },
+          {
+            "id": "report-again-option-uuid",
+            "value": "repeatOfferDetails"
+          },
+          {
+            "id": "ask-again-option-uuid",
+            "value": "repeatOptions"
+          }
+        ],
+        "useDynamic": false,
+        "dynamicMetadata": {
+          "x-amz-lex:barge-in-enabled:*:*": false
+        }
+      },
+      "target": "Lex"
+    },
+    {
+      "id": "invoke-lambda-function-uuid",
+      "type": "InvokeExternalResource",
+      "branches": [
+        {
+          "condition": "Success",
+          "transition": "collect-lambda-outputs-uuid"
+        },
+        {
+          "condition": "Error",
+          "transition": "chatbot-error-response-uuid"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "FunctionArn",
+          "value": "arn:aws:lambda:ap-southeast-1:564702493239:function:update_covid_19_offer_status",
+          "namespace": null
+        },
+        {
+          "name": "TimeLimit",
+          "value": "3"
+        },
+        {
+          "name": "Parameter",
+          "key": "offerStatus",
+          "value": "Lex.IntentName",
+          "namespace": "System"
+        },
+        {
+          "name": "Parameter",
+          "key": "offerId",
+          "value": "offerId",
+          "namespace": "User Defined"
+        }
+      ],
+      "metadata": {
+        "position": {
+          "x": 1192,
+          "y": 24
+        },
+        "dynamicMetadata": {
+          "offerStatus": true,
+          "offerId": true
+        },
+        "useDynamic": false
+      },
+      "target": "Lambda"
+    }
+  ],
+  "version": "1",
+  "type": "contactFlow",
+  "start": "disable-call-recording-uuid",
+  "metadata": {
+    "entryPointPosition": {
+      "x": 15,
+      "y": 15
+    },
+    "snapToGrid": false,
+    "name": "free_covid_19_vaccine_offer",
+    "description": "Chatbot offering free COVID-19 vaccines for our mankind",
+    "type": "contactFlow",
+    "status": "published",
+    "hash": "..."
+  }
+}
